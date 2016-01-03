@@ -75,16 +75,17 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
     /**
      * Comment Texts List associated with the mediator
      */
-    private List<String> commentsList = new ArrayList<String>(); 
+    private List<String> commentsList = new ArrayList<String>();
 
     /**
-     * this method is invoked mediation happens either in debug mode or normal running mode,
-     * branches execution to the debug manager if only in debug mode
-     * @return true if the mediation should be continued after this method call, false if mediation
+     * This method is invoked when mediation happens in debug mode, branches execution to
+     * the Debug Manager, further behavior is governed by the Debug Manager.
+     *
+     * @return false if the mediation should be continued after this method call, true if mediation
      * of current child mediator position should be skipped
      */
-    public boolean divertMediationRoute(MessageContext synCtx){
-        if(synCtx.getEnvironment().isDebugEnabled()) {
+    public boolean divertMediationRoute(MessageContext synCtx) {
+        if (synCtx.getEnvironment().isDebugEnabled()) {
             if (isSkipEnabled()) {
                 synCtx.getEnvironment().getSynapseDebugManager()
                         .advertiseMediationFlowSkip(synCtx, getRegisteredMediationFlowPoint());
@@ -426,18 +427,36 @@ public abstract class AbstractMediator implements Mediator, AspectConfigurable {
         this.commentsList = commentsList;
     }
 
-    public void registerMediationFlowPoint(SynapseMediationFlowPoint flowPoint){this.flowPoint=flowPoint;}
+    public void registerMediationFlowPoint(SynapseMediationFlowPoint flowPoint) {
+        this.flowPoint = flowPoint;
+    }
 
-    public void unregisterMediationFlowPoint(){if(this.flowPoint!=null)this.flowPoint=null;}
+    public void unregisterMediationFlowPoint() {
+        if (this.flowPoint != null) {
+            if (!(isBreakPoint && isSkipEnabled)) {
+                this.flowPoint = null;
+            }
+        }
+    }
 
-    public SynapseMediationFlowPoint getRegisteredMediationFlowPoint(){return flowPoint;}
+    public SynapseMediationFlowPoint getRegisteredMediationFlowPoint() {
+        return flowPoint;
+    }
 
-    public boolean isBreakPoint(){return isBreakPoint;}
+    public boolean isBreakPoint() {
+        return isBreakPoint;
+    }
 
-    public boolean isSkipEnabled(){return isSkipEnabled;}
+    public boolean isSkipEnabled() {
+        return isSkipEnabled;
+    }
 
-    public void setBreakPoint(boolean isBreakPoint){this.isBreakPoint=isBreakPoint;}
+    public void setBreakPoint(boolean isBreakPoint) {
+        this.isBreakPoint = isBreakPoint;
+    }
 
-    public void setSkipEnabled(boolean isSkipEnabled){this.isSkipEnabled=isSkipEnabled;}
+    public void setSkipEnabled(boolean isSkipEnabled) {
+        this.isSkipEnabled = isSkipEnabled;
+    }
 
 }
